@@ -5,12 +5,11 @@ class Module:
     def __init__(self, mainMenu, params=[]):
 
         self.info = {
-            'Name': 'Invoke-Portscan',
+            'Name': 'Invoke-PortScan',
 
-            'Author': ['Rich Lundeen'],
+            'Author': ['Goude 2012, TrueSec'],
 
-            'Description': ('Does a simple port scan using regular sockets, based '
-                            '(pretty) loosely on nmap.'),
+            'Description': ('Scan for IP-Addresses, HostNames and open Ports in your Network.'),
 
             'Background' : True,
 
@@ -25,7 +24,7 @@ class Module:
             'MinLanguageVersion' : '2',
             
             'Comments': [
-                'https://github.com/mattifestation/PowerSploit/blob/master/Recon/Invoke-Portscan.ps1'
+                'https://raw.githubusercontent.com/samratashok/nishang/master/Scan/Invoke-PortScan.ps1'
             ]
         }
 
@@ -38,69 +37,38 @@ class Module:
                 'Required'      :   True,
                 'Value'         :   ''
             },
-            'Hosts' : {
-                'Description'   :   "Hosts to scan.",
-                'Required'      :   False,
+            'StartAddress' : {
+                'Description'   :   "Start Address of the desired range.",
+                'Required'      :   True,
                 'Value'         :   ''
             },
-            'HostFile' : {
-                'Description'   :   "Input hosts from file (on the target)",
-                'Required'      :   False,
+            'EndAddress' : {
+                'Description'   :   "End Address of the desired range.",
+                'Required'      :   True,
                 'Value'         :   ''
             },
-            'ExcludeHosts' : {
-                'Description'   :   "Exclude thsee comma separated hosts.",
+            'ResolveHost' : {
+                'Description'   :   "Resolves Hostnames",
                 'Required'      :   False,
                 'Value'         :   ''
             },
             'Ports' : {
-                'Description'   :   "Comma separated ports to scan for.",
+                'Description'   :   "Ports That should be scanned, default values are: 21,22,23,53,69,71,80,98,110,139,111,389,443,445,1080,1433,2001,2049,3001,3128,5222,6667,6868,7777,7878,8080,1521,3306,3389,5801,5900,5555,5901",
                 'Required'      :   False,
                 'Value'         :   ''
             },
-            'TopPorts' : {
-                'Description'   :   "Scan for X top ports, default 50.",
+            'TimeOut' : {
+                'Description'   :   "Time (in MilliSeconds) before TimeOut, Default set to 100",
                 'Required'      :   False,
                 'Value'         :   ''
             },
-            'SkipDiscovery' : {
-                'Description'   :   "Switch. Treat all hosts as online.",
+            'ScanPort' : {
+                'Description'   :   "Perform a Port Scan",
                 'Required'      :   False,
-                'Value'         :   ''
-            },
-            'PingOnly' : {
-                'Description'   :   "Switch. Ping only, don't scan for ports.",
-                'Required'      :   False,
-                'Value'         :   ''
-            },
-            'Open' : {
-                'Description'   :   "Switch. Only show hosts with open ports.",
-                'Required'      :   False,
-                'Value'         :   'True'
-            },        
-            'GrepOut' : {
-                'Description'   :   "Greppable (.gnmap) output file.",
-                'Required'      :   False,
-                'Value'         :   ''
-            },
-            'XmlOut' : {
-                'Description'   :   ".XML output file.",
-                'Required'      :   False,
-                'Value'         :   ''
-            },
-            'ReadableOut' : {
-                'Description'   :   "Readable (.nmap) output file.",
-                'Required'      :   False,
-                'Value'         :   ''
-            },
-            'AllformatsOut' : {
-                'Description'   :   "Output file of all formats.",
-                'Required'      :   False,
-                'Value'         :   ''
+                'Value'         :   'true'
             }
-        }
 
-        # save off a copy of the mainMenu object to access external functionality
+        }    
         #   like listeners/agent handlers/etc.
         self.mainMenu = mainMenu
 
@@ -114,7 +82,7 @@ class Module:
     def generate(self, obfuscate=False, obfuscationCommand=""):
 
         # read in the common module source code
-        moduleSource = self.mainMenu.installPath + "/data/module_source/situational_awareness/network/Invoke-Portscan.ps1"
+        moduleSource = self.mainMenu.installPath + "/data/module_source/situational_awareness/network/Invoke-PortScan.ps1"
         if obfuscate:
             helpers.obfuscate_module(moduleSource=moduleSource, obfuscationCommand=obfuscationCommand)
             moduleSource = moduleSource.replace("module_source", "obfuscated_module_source")
@@ -129,7 +97,7 @@ class Module:
 
         script = moduleCode
 
-        scriptEnd = "Invoke-PortScan -noProgressMeter -f"
+        scriptEnd = "Invoke-PortScan"
 
         for option,values in self.options.iteritems():
             if option.lower() != "agent":
@@ -140,7 +108,6 @@ class Module:
                     else:
                         scriptEnd += " -" + str(option) + " " + str(values['Value']) 
 
-        scriptEnd += " | ? {$_.alive}| Select-Object HostName,@{name='OpenPorts';expression={$_.openPorts -join ','}} | ft -wrap | Out-String | %{$_ + \"`n\"}"
         if obfuscate:
             scriptEnd = helpers.obfuscate(self.mainMenu.installPath, psScript=scriptEnd, obfuscationCommand=obfuscationCommand)
         script += scriptEnd

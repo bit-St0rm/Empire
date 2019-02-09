@@ -31,6 +31,7 @@ The Agents() class in instantiated in ./empire.py by the main menu and includes:
     get_agents_for_listener()   - returns all agent objects linked to a given listener name
     get_agent_names_listener_db()-returns all agent names linked to a given listener name
     get_autoruns_db()           - returns any global script autoruns
+    get_agents_by_username_host()-returns true if there are any active agents with specified username and hostname
     update_agent_results_db()   - updates agent results in the database
     update_agent_sysinfo_db()   - updates agent system information in the database
     update_agent_lastseen_db()  - updates the agent's last seen timestamp in the database
@@ -839,6 +840,28 @@ class Agents:
             self.lock.release()
 
         return autoruns
+
+
+    def get_agents_by_username_host(self, username, hostname):
+        """
+        Return true if an active agent exists with a specified hostname and username.
+        """
+
+        conn = self.get_db_connection()
+
+        try:
+            self.lock.acquire()
+            cur = conn.cursor()
+            cur.execute("SELECT 1 FROM agents WHERE username= ? AND hostname= ?", [username, hostname])
+            exists = cur.fetchone()
+            cur.close()
+        finally: 
+            self.lock.release()
+
+        if exists:
+            return True
+        else:
+            return False
 
 
     ###############################################################
