@@ -7,7 +7,7 @@ class Module:
         self.info = {
             'Name': 'Invoke-SSHCommand',
 
-            'Author': ['@424f424f'],
+            'Author': ['@424f424f', 'st0rm'],
 
             'Description': ('Executes a command on a remote host via SSH.'),
 
@@ -47,6 +47,11 @@ class Module:
                 'Required'      :   True,
                 'Value'         :   ''
             },
+            'Port' : {
+                'Description'   :   'Address of the target server.',
+                'Required'      :   False,
+                'Value'         :   ''
+            },
             'Username' : {
                 'Description'   :   'The username to login with.',
                 'Required'      :   False,
@@ -54,6 +59,11 @@ class Module:
             },
             'Password' : {
                 'Description'   :   'The password to login with.',
+                'Required'      :   False,
+                'Value'         :   ''
+            },
+            'KeyFile' : {
+                'Description'   :   'The path to a private key file on the accesible by the agent\'s host.',
                 'Required'      :   False,
                 'Value'         :   ''
             },
