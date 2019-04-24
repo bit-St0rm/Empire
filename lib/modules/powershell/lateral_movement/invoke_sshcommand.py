@@ -1,4 +1,5 @@
 from lib.common import helpers
+import base64
 
 class Module:
 
@@ -63,7 +64,7 @@ class Module:
                 'Value'         :   ''
             },
             'KeyFile' : {
-                'Description'   :   'The path to a private key file on the accesible by the agent\'s host.',
+                'Description'   :   'The path to a private key file on the empire server.',
                 'Required'      :   False,
                 'Value'         :   ''
             },
@@ -84,6 +85,14 @@ class Module:
                 self.options[option]['Value'] = value
 
     def generate(self, obfuscate=False, obfuscationCommand=""):
+
+        try:
+            keyFile = open(self.options['KeyFile']['Value'], "r").read()
+        except:
+            print helpers.color("[!] Could not read key file at: " + self.options['KeyFile']['Value']) 
+
+        keyFile = base64.b64encode(keyFile)
+        self.options['KeyFile']['Value'] = keyFile
 
         moduleSource = self.mainMenu.installPath + "/data/module_source/lateral_movement/Invoke-SSHCommand.ps1"
         if obfuscate:
