@@ -4,7 +4,7 @@ function Invoke-SSHCommand {
 .Description
     This script was created to easily send commands to SSH servers.
 
-.Parameter IP
+.Parameter Ip
     The string containing the IP or hostname of the target server.
     
 .Parameter Username
@@ -41,7 +41,7 @@ function Invoke-SSHCommand {
 
         [Parameter(Mandatory=$false)]
         [String]
-        $EncodedKeyFile,
+        $KeyFile,
 
         [Parameter(Mandatory=$false)]
         [Int]
@@ -56,7 +56,7 @@ function Invoke-SSHCommand {
     $Content = [System.Convert]::FromBase64String($Base64Dll)
     try
     {
-        [System.Reflection.Assembly]::Load($Content)
+        [System.Reflection.Assembly]::Load($Content) | Out-Null
     }
     catch
     {
@@ -66,11 +66,11 @@ function Invoke-SSHCommand {
 
     Try
     {
-        If($EncodedKeyFile)
+        If($KeyFile)
         {
-            $KeyFile = [System.Convert]::FromBase64String($EncodedKeyFile)
-            $KeyFile = [System.IO.MemoryStream]$KeyFile
-            $PrivateKeyFile = New-Object Renci.SshNet.PrivateKeyFile($KeyFile)
+            $EncodedKeyFile = [System.Convert]::FromBase64String($KeyFile)
+            $EncodedKeyFile = [System.IO.MemoryStream]$EncodedKeyFile
+            $PrivateKeyFile = New-Object Renci.SshNet.PrivateKeyFile($EncodedKeyFile)
             $PrivateKeyAuthenticationMethod = New-Object Renci.SshNet.PrivateKeyAuthenticationMethod($Username, $PrivateKeyFile)
 
             If($Password)
@@ -95,7 +95,7 @@ function Invoke-SSHCommand {
 
         $SSHClient = New-Object Renci.SshNet.SSHClient($ConnectionInfo)
         $SSHClient.Connect()
-        $SSHClient.RunCommand($command).Result
+        $SSHClient.RunCommand($command).Result | Out-String
         $SSHClient.Disconnect()
     } Catch {
         "[!] Error establishing connection!"  | Out-String
