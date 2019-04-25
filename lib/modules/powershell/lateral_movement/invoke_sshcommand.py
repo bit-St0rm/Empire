@@ -43,19 +43,19 @@ class Module:
                 'Required'      :   False,
                 'Value'         :   ''                
             },
-            'IP' : {
+            'Ip' : {
                 'Description'   :   'Address of the target server.',
                 'Required'      :   True,
                 'Value'         :   ''
             },
             'Port' : {
                 'Description'   :   'Address of the target server.',
-                'Required'      :   False,
-                'Value'         :   ''
+                'Required'      :   True,
+                'Value'         :   '22'
             },
             'Username' : {
                 'Description'   :   'The username to login with.',
-                'Required'      :   False,
+                'Required'      :   True,
                 'Value'         :   ''
             },
             'Password' : {
@@ -86,13 +86,16 @@ class Module:
 
     def generate(self, obfuscate=False, obfuscationCommand=""):
 
-        try:
-            keyFile = open(self.options['KeyFile']['Value'], "r").read()
-        except:
-            print helpers.color("[!] Could not read key file at: " + self.options['KeyFile']['Value']) 
+        keyFile = self.options['KeyFile']['Value']
 
-        keyFile = base64.b64encode(keyFile)
-        self.options['KeyFile']['Value'] = keyFile
+        if keyFile:
+            try:
+                openKeyFile = open(keyFile, "r")
+            except:
+                print helpers.color("[!] Could not read key file at: " + keyFile) 
+
+            encodedKeyFile = base64.b64encode(openKeyFile.read())
+            openKeyFile.close()
 
         moduleSource = self.mainMenu.installPath + "/data/module_source/lateral_movement/Invoke-SSHCommand.ps1"
         if obfuscate:
@@ -127,10 +130,7 @@ class Module:
                 self.options["Password"]['Value'] = str(password)
 
         if self.options["Username"]['Value'] == "":
-            print helpers.color("[!] Either 'CredId' or Username/Password must be specified.")
-            return ""
-        if self.options["Password"]['Value'] == "":
-            print helpers.color("[!] Either 'CredId' or Username/Password must be specified.")
+            print helpers.color("A Username must be specified.")
             return ""
             
         for option,values in self.options.iteritems():
@@ -140,7 +140,10 @@ class Module:
                         # if we're just adding a switch
                         scriptEnd += " -" + str(option)
                     else:
-                        scriptEnd += " -" + str(option) + " " + str(values['Value']) 
+                        if option.lower() == "keyfile":
+                            scriptEnd += " -" + str(option) + " " + encodedKeyFile
+                        else:
+                            scriptEnd += " -" + str(option) + " " + str(values['Value']) 
         if obfuscate:
             scriptEnd = helpers.obfuscate(self.mainMenu.installPath, psScript=scriptEnd, obfuscationCommand=obfuscationCommand)
         script += scriptEnd
