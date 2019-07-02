@@ -65,7 +65,7 @@ class Listener:
             'Launcher' : {
                 'Description'   :   'Launcher string.',
                 'Required'      :   True,
-                'Value'         :   'powershell -noP -sta -w 1 -enc '
+                'Value'         :   'POWerShell.EXe -wIndO 1 -stAG -noPrO -enc '
             },
             'StagingKey' : {
                 'Description'   :   'Staging key for initial agent negotiation.',
