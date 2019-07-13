@@ -65,7 +65,7 @@ class Listener:
             'Launcher' : {
                 'Description'   :   'Launcher string.',
                 'Required'      :   True,
-                'Value'         :   'POWerShell.EXe -wIndO 1 -stAG -noPrO -enc '
+                'Value'         :   'POWerShell.EXe -wIndO 1 -stA -noPrO -enc '
             },
             'StagingKey' : {
                 'Description'   :   'Staging key for initial agent negotiation.',
