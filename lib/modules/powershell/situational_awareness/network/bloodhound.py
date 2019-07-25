@@ -90,7 +90,7 @@ class Module:
              'RandomFilenames' : {
                 'Description'   :   'The number of cypher queries to queue up for neo4j RESTful API ingestion.',
                 'Required'      :   False,
-                'Value'         :   True
+                'Value'         :   'true'
             }           
         }
 
