@@ -37,18 +37,8 @@ class Module:
                 'Required'      :   True,
                 'Value'         :   ''
             },
-            'ComputerName' : {
+            'ComputerFile' : {
                 'Description'   :   'Array of one or more computers to enumerate',
-                'Required'      :   False,
-                'Value'         :   ''
-            },
-            'ComputerADSpath' : {
-                'Description'   :   'The LDAP source to search through for computers, e.g. "LDAP://OU=secret,DC=testlab,DC=local"',
-                'Required'      :   False,
-                'Value'         :   ''
-            },
-            'UserADSPath' : {
-                'Description'   :   'The LDAP source to search through for users/groups, e.g. "LDAP://OU=secret,DC=testlab,DC=local"',
                 'Required'      :   False,
                 'Value'         :   ''
             },
@@ -72,28 +62,13 @@ class Module:
                 'Required'      :   False,
                 'Value'         :   ''
             },
-            'CSVFolder' : {
+            'JSONFolder' : {
                 'Description'   :   'The CSV folder to use for output, defaults to the current folder location.',
                 'Required'      :   False,
                 'Value'         :   '$(Get-Location)'
             },
-            'CSVPrefix' : {
+            'JSONPrefix' : {
                 'Description'   :   'A prefix for all CSV files.',
-                'Required'      :   False,
-                'Value'         :   ''
-            },
-            'URI' : {
-                'Description'   :   'The BloodHound neo4j URL location (http://host:port/)',
-                'Required'      :   False,
-                'Value'         :   ''
-            },
-            'UserPass' : {
-                'Description'   :   'The "user:password" for the BloodHound neo4j instance',
-                'Required'      :   False,
-                'Value'         :   ''
-            },
-            'GlobalCatalog' : {
-                'Description'   :   'The global catalog location to resolve user memberships from.',
                 'Required'      :   False,
                 'Value'         :   ''
             },
@@ -111,7 +86,12 @@ class Module:
                 'Description'   :   'The number of cypher queries to queue up for neo4j RESTful API ingestion.',
                 'Required'      :   True,
                 'Value'         :   '1000'
-            }
+            },
+             'RandomFilenames' : {
+                'Description'   :   'The number of cypher queries to queue up for neo4j RESTful API ingestion.',
+                'Required'      :   False,
+                'Value'         :   True
+            }           
         }
 
         # save off a copy of the mainMenu object to access external functionality
